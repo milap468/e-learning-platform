@@ -1,0 +1,81 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+enum Level {
+  Easy
+  Medium
+  Hard
+}
+
+enum Popularity {
+  Popular
+  Okkies
+  NotPoppular
+}
+
+
+
+model User {
+  id Int @id @default(autoincrement())
+  fullName String
+  email String @unique
+  password String
+  avatar String?
+  superAdmin Boolean @default(false)
+  courses Enrollements[]
+  refresh_token String?
+
+}
+
+model Course {
+  id Int @id @default(autoincrement())
+  name String
+  description String
+  level Level
+  popular Popularity?
+  rating Int?
+  categories CourseToCategory[]
+  users Enrollements[]
+  price Float?
+
+}
+
+model Category {
+  id Int @id @default(autoincrement())
+  name String
+  courses CourseToCategory[]
+}
+
+model CourseToCategory {
+  course Course @relation(fields: [courseId],references: [id])
+  courseId Int
+  category Category @relation(fields: [categoryId],references: [id])
+  categoryId Int
+  assignedAt DateTime @default(now())
+
+  @@id([courseId,categoryId])
+}
+
+model Enrollements {
+  user User @relation(fields: [userId],references: [id])
+  userId Int
+  course Course @relation(fields: [courseId],references: [id])
+  courseId Int
+
+  @@id([userId,courseId])
+}
+
+
